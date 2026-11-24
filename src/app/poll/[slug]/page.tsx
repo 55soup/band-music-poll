@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPollBySlug, getSongsWithVotes } from "@/lib/queries";
-import { youtubeEmbedUrl } from "@/lib/youtube";
 import { AddSongForm } from "./AddSongForm";
 import { VoteButton } from "./VoteButton";
 import { ShareButton } from "./ShareButton";
+import { YouTubeEmbed } from "./YouTubeEmbed";
 
 export default async function PollPage({
   params,
@@ -65,16 +65,7 @@ export default async function PollPage({
                   votedByMe={song.voted_by_me}
                 />
               </div>
-              <div className="aspect-video w-full bg-black">
-                <iframe
-                  className="h-full w-full"
-                  src={youtubeEmbedUrl(song.youtube_video_id)}
-                  title={song.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </div>
+              <YouTubeEmbed videoId={song.youtube_video_id} title={song.title} />
             </li>
           ))}
         </ol>
