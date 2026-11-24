@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎸 밴드 합주곡 투표 (band-music-poll)
 
-## Getting Started
+유튜브 링크로 합주곡을 추가하고 👍 로 투표해서 다음 합주곡을 정하는 사이트.
+링크를 받은 사람은 누구나 곡을 추가하고 투표할 수 있어요. (로그인 없이 익명 쿠키로 구분)
 
-First, run the development server:
+## 스택
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Next.js 16** (App Router) + TypeScript + Tailwind CSS v4
+- **Supabase** (PostgreSQL) — publishable key로 클라이언트 연결
+- 투표자 구분: 익명 쿠키(`voter_id`)
+- Node **22** 이상 필요 (`.nvmrc` 참고)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 처음 세팅
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **환경변수** — `.env.local` 에 Supabase 값 채우기 (`.env.example` 참고)
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxx
+   ```
+2. **DB 스키마** — Supabase 대시보드 > SQL Editor 에 [`supabase/schema.sql`](supabase/schema.sql) 붙여넣고 Run
+3. **의존성 & 실행**
+   ```bash
+   nvm use         # Node 22
+   yarn install
+   yarn dev        # http://localhost:3000
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 데이터 모델
 
-## Learn More
+- `polls` — 투표판 (링크 하나 = 행 하나, `slug`로 접근)
+- `songs` — 곡 (`poll_id`, `youtube_video_id`, `added_by`)
+- `votes` — 투표 (`song_id` + `voter_id` 유니크 = 한 곡당 1인 1표)
 
-To learn more about Next.js, take a look at the following resources:
+곡 목록은 투표수 내림차순(동률이면 추가된 순)으로 정렬돼요.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 라우트
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `/` — 투표판 목록 + 새 투표판 만들기
+- `/poll/[slug]` — 곡 추가 / 유튜브 임베드 / 투표
 
-## Deploy on Vercel
+## 참고
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 지금 RLS 정책은 로그인 없는 밴드 내부용이라 **공개(public)** 상태입니다.
+  나중에 멤버 로그인을 붙이면 `supabase/schema.sql`의 정책을 조여야 해요.
