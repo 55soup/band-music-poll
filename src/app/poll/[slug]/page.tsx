@@ -5,6 +5,7 @@ import { AddSongForm } from "./AddSongForm";
 import { VoteButton } from "./VoteButton";
 import { ShareButton } from "./ShareButton";
 import { YouTubeEmbed } from "./YouTubeEmbed";
+import { DeleteSongButton } from "./DeleteSongButton";
 
 export default async function PollPage({
   params,
@@ -64,6 +65,9 @@ export default async function PollPage({
                   voteCount={song.vote_count}
                   votedByMe={song.voted_by_me}
                 />
+                {song.can_delete && (
+                  <DeleteSongButton slug={slug} songId={song.id} />
+                )}
               </div>
               <YouTubeEmbed videoId={song.youtube_video_id} title={song.title} />
             </li>

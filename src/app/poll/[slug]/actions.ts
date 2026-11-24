@@ -21,6 +21,7 @@ export async function addSong(
     return { ok: false, error: "유튜브 링크를 인식하지 못했어요. 주소를 다시 확인해 주세요." };
   }
 
+  const voterId = await getOrCreateVoterId();
   const supabase = await createClient();
 
   const { data: poll, error: pollError } = await supabase
@@ -36,7 +37,35 @@ export async function addSong(
     title: title || "제목 없는 곡",
     youtube_video_id: videoId,
     added_by: addedBy,
+    added_by_voter: voterId,
   });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/poll/${slug}`);
+  return { ok: true };
+}
+
+/** 곡 삭제: 올린 사람(쿠키 ID 일치)만 가능 */
+export async function deleteSong(
+  slug: string,
+  songId: string,
+): Promise<ActionResult> {
+  const voterId = await getOrCreateVoterId();
+  const supabase = await createClient();
+
+  const { data: song, error: selError } = await supabase
+    .from("songs")
+    .select("added_by_voter")
+    .eq("id", songId)
+    .maybeSingle();
+  if (selError) return { ok: false, error: selError.message };
+  if (!song) return { ok: false, error: "이미 삭제된 곡이에요." };
+
+  if (song.added_by_voter !== voterId) {
+    return { ok: false, error: "내가 올린 곡만 삭제할 수 있어요." };
+  }
+
+  const { error } = await supabase.from("songs").delete().eq("id", songId);
   if (error) return { ok: false, error: error.message };
 
   revalidatePath(`/poll/${slug}`);

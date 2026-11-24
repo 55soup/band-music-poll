@@ -11,6 +11,7 @@ export type Song = {
   title: string;
   youtube_video_id: string;
   added_by: string | null;
+  added_by_voter: string | null;
   created_at: string;
 };
 
@@ -25,4 +26,5 @@ export type Vote = {
 export type SongWithVotes = Song & {
   vote_count: number;
   voted_by_me: boolean;
+  can_delete: boolean; // 내가 올린 곡이라 삭제 가능한지
 };

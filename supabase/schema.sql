@@ -19,7 +19,8 @@ create table if not exists public.songs (
   poll_id          uuid not null references public.polls(id) on delete cascade,
   title            text not null,
   youtube_video_id text not null,
-  added_by         text,
+  added_by         text,          -- 표시용 이름 (선택)
+  added_by_voter   text,          -- 올린 사람의 익명 쿠키 ID (삭제 권한 판별용)
   created_at       timestamptz not null default now()
 );
 
@@ -51,11 +52,13 @@ drop policy if exists "polls insert" on public.polls;
 create policy "polls read"   on public.polls for select using (true);
 create policy "polls insert" on public.polls for insert with check (true);
 
--- songs: 누구나 읽기/추가
+-- songs: 누구나 읽기/추가, 삭제(소유권 체크는 앱에서)
 drop policy if exists "songs read"   on public.songs;
 drop policy if exists "songs insert" on public.songs;
+drop policy if exists "songs delete" on public.songs;
 create policy "songs read"   on public.songs for select using (true);
 create policy "songs insert" on public.songs for insert with check (true);
+create policy "songs delete" on public.songs for delete using (true);
 
 -- votes: 누구나 읽기/추가/삭제(=취소)
 drop policy if exists "votes read"   on public.votes;

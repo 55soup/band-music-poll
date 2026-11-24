@@ -59,6 +59,7 @@ export async function getSongsWithVotes(pollId: string): Promise<SongWithVotes[]
       ...s,
       vote_count: counts.get(s.id) ?? 0,
       voted_by_me: mine.has(s.id),
+      can_delete: !!voterId && s.added_by_voter === voterId,
     }))
     .sort(
       (a, b) =>
