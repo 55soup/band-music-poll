@@ -66,6 +66,38 @@ create policy "votes insert" on public.votes for insert with check (true);
 create policy "votes delete" on public.votes for delete using (true);
 
 -- ============================================================
+-- 유튜브 검색 일일 한도 (migrations/001 과 동일 — 신규 세팅용)
+-- ============================================================
+create table if not exists public.youtube_search_usage (
+  day   date primary key default current_date,
+  count int  not null default 0
+);
+alter table public.youtube_search_usage enable row level security;
+
+create or replace function public.bump_youtube_search(daily_limit int)
+returns table(allowed boolean, used int, day_limit int)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  cur int;
+begin
+  insert into public.youtube_search_usage(day, count)
+    values (current_date, 0)
+    on conflict (day) do nothing;
+  select count into cur from public.youtube_search_usage where day = current_date for update;
+  if cur >= daily_limit then
+    return query select false, cur, daily_limit;
+  else
+    update public.youtube_search_usage set count = count + 1 where day = current_date;
+    return query select true, cur + 1, daily_limit;
+  end if;
+end;
+$$;
+grant execute on function public.bump_youtube_search(int) to anon, authenticated;
+
+-- ============================================================
 -- 시드: 우리 밴드 기본 투표판
 -- ============================================================
 insert into public.polls (slug, title)
