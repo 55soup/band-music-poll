@@ -72,6 +72,32 @@ export async function deleteSong(
   return { ok: true };
 }
 
+/** 공연 정보(날짜 / 곡 수) 수정 — 로그인 없으니 누구나 가능 */
+export async function updatePollSettings(
+  slug: string,
+  formData: FormData,
+): Promise<ActionResult> {
+  const dateRaw = String(formData.get("performance_date") ?? "").trim();
+  const countRaw = String(formData.get("target_song_count") ?? "").trim();
+
+  const performance_date = dateRaw || null;
+  let target_song_count: number | null = null;
+  if (countRaw) {
+    const n = Number.parseInt(countRaw, 10);
+    target_song_count = Number.isNaN(n) || n < 1 ? null : n;
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("polls")
+    .update({ performance_date, target_song_count })
+    .eq("slug", slug);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/poll/${slug}`);
+  return { ok: true };
+}
+
 /** 투표 토글: 이미 했으면 취소, 안 했으면 추가 */
 export async function toggleVote(
   slug: string,

@@ -2,6 +2,8 @@ export type Poll = {
   id: string;
   slug: string;
   title: string;
+  performance_date: string | null; // 공연 날짜 (YYYY-MM-DD), 미설정이면 null
+  target_song_count: number | null; // 공연 곡 수, 미설정이면 null
   created_at: string;
 };
 

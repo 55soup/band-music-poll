@@ -26,16 +26,40 @@ export default async function Home() {
         <h2 className="mb-3 text-xs font-bold tracking-[0.2em] uppercase text-muted">
           [ 새 투표판 만들기 ]
         </h2>
-        <form action={createPoll} className="flex gap-2">
+        <form action={createPoll} className="flex flex-col gap-2">
           <input
             name="title"
             required
             placeholder="예) 12월 정기공연 셋리스트"
-            className="flex-1 border border-[var(--line)] bg-transparent px-4 py-2.5 text-sm outline-none focus:border-foreground"
+            className="w-full border border-[var(--line)] bg-transparent px-4 py-2.5 text-sm outline-none focus:border-foreground"
           />
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <label className="flex flex-1 flex-col gap-1">
+              <span className="text-[0.65rem] uppercase tracking-wide text-muted">
+                공연 날짜 (선택)
+              </span>
+              <input
+                type="date"
+                name="performance_date"
+                className="w-full border border-[var(--line)] bg-transparent px-4 py-2.5 text-sm outline-none focus:border-foreground"
+              />
+            </label>
+            <label className="flex flex-1 flex-col gap-1">
+              <span className="text-[0.65rem] uppercase tracking-wide text-muted">
+                공연 곡 수 (선택)
+              </span>
+              <input
+                type="number"
+                name="target_song_count"
+                min={1}
+                placeholder="예) 5"
+                className="w-full border border-[var(--line)] bg-transparent px-4 py-2.5 text-sm outline-none focus:border-foreground"
+              />
+            </label>
+          </div>
           <button
             type="submit"
-            className="border border-foreground bg-foreground px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-background transition-opacity hover:opacity-80"
+            className="self-start border border-foreground bg-foreground px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-background transition-opacity hover:opacity-80"
           >
             만들기
           </button>

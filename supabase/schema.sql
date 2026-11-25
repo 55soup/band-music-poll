@@ -7,10 +7,12 @@ create extension if not exists pgcrypto;
 
 -- 투표판 (나중에 링크 여러 개 = polls 여러 행)
 create table if not exists public.polls (
-  id         uuid primary key default gen_random_uuid(),
-  slug       text unique not null,
-  title      text not null,
-  created_at timestamptz not null default now()
+  id                uuid primary key default gen_random_uuid(),
+  slug              text unique not null,
+  title             text not null,
+  performance_date  date,          -- 공연 날짜 (선택)
+  target_song_count int,           -- 공연에서 할 곡 수 (선택)
+  created_at        timestamptz not null default now()
 );
 
 -- 곡
@@ -46,11 +48,13 @@ alter table public.polls enable row level security;
 alter table public.songs enable row level security;
 alter table public.votes enable row level security;
 
--- polls: 누구나 읽기/생성 (삭제/수정은 막아둠)
+-- polls: 누구나 읽기/생성/수정 (공연 정보는 나중에 수정 가능해야 함)
 drop policy if exists "polls read"   on public.polls;
 drop policy if exists "polls insert" on public.polls;
+drop policy if exists "polls update" on public.polls;
 create policy "polls read"   on public.polls for select using (true);
 create policy "polls insert" on public.polls for insert with check (true);
+create policy "polls update" on public.polls for update using (true) with check (true);
 
 -- songs: 누구나 읽기/추가, 삭제(소유권 체크는 앱에서)
 drop policy if exists "songs read"   on public.songs;
