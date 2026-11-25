@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 function makeSlug(title: string): string {
   const base = title
     .toLowerCase()
-    .replace(/[^a-z0-9가-힣]+/g, "-")
+    .replace(/[^a-z0-9]+/g, "-") // slug 은 ASCII 만 — 한글이 들어가면 URL/헤더 인코딩에서 깨짐
     .replace(/^-+|-+$/g, "")
     .slice(0, 30);
   const suffix = randomUUID().slice(0, 6);
@@ -25,5 +25,5 @@ export async function createPoll(formData: FormData) {
   const { error } = await supabase.from("polls").insert({ slug, title });
   if (error) throw error;
 
-  redirect(`/poll/${slug}`);
+  redirect(`/poll/${encodeURIComponent(slug)}`);
 }
