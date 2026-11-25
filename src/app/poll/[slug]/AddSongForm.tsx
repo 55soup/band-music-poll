@@ -16,13 +16,13 @@ export function AddSongForm({ slug }: { slug: string }) {
   const [addedBy, setAddedBy] = useState("");
 
   return (
-    <div className="rounded-xl border border-black/10 p-4 dark:border-white/15">
-      <div className="mb-3 flex items-center gap-1">
+    <div className="border border-[var(--line)] p-4">
+      <div className="mb-3 flex items-center gap-2">
         <TabButton active={mode === "search"} onClick={() => setMode("search")}>
-          🔍 유튜브 검색
+          [ 검색 ]
         </TabButton>
         <TabButton active={mode === "paste"} onClick={() => setMode("paste")}>
-          🔗 링크 붙여넣기
+          [ 링크 ]
         </TabButton>
       </div>
 
@@ -30,7 +30,7 @@ export function AddSongForm({ slug }: { slug: string }) {
         value={addedBy}
         onChange={(e) => setAddedBy(e.target.value)}
         placeholder="내 이름 (선택 — 누가 추가했는지 표시)"
-        className="mb-3 w-full rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/40 dark:border-white/20 dark:focus:border-white/50"
+        className="mb-3 w-full border border-[var(--line)] bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground"
       />
 
       {mode === "search" ? (
@@ -56,10 +56,10 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={[
-        "rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors",
+        "border px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors",
         active
-          ? "bg-foreground text-background"
-          : "opacity-50 hover:opacity-80",
+          ? "border-foreground bg-foreground text-background"
+          : "border-transparent text-muted hover:text-foreground",
       ].join(" ")}
     >
       {children}
@@ -130,7 +130,7 @@ function SearchMode({ slug, addedBy }: { slug: string; addedBy: string }) {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="곡 제목 / 아티스트로 검색 (예: 잔나비 주저하는 연인들을 위해)"
-        className="w-full rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/40 dark:border-white/20 dark:focus:border-white/50"
+        className="w-full border border-[var(--line)] bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground"
       />
       {loading && <p className="mt-2 text-xs opacity-50">검색 중…</p>}
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
@@ -140,23 +140,23 @@ function SearchMode({ slug, addedBy }: { slug: string; addedBy: string }) {
           {results.map((r) => (
             <li
               key={r.videoId}
-              className="flex items-center gap-3 rounded-lg border border-black/10 p-2 dark:border-white/15"
+              className="flex items-center gap-3 border border-[var(--line)] p-2"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={r.thumbnail}
                 alt=""
-                className="h-12 w-20 flex-shrink-0 rounded object-cover"
+                className="h-12 w-20 flex-shrink-0 object-cover grayscale"
               />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{decodeHtml(r.title)}</p>
-                <p className="truncate text-xs opacity-50">{decodeHtml(r.channel)}</p>
+                <p className="truncate text-xs text-muted">{decodeHtml(r.channel)}</p>
               </div>
               <button
                 type="button"
                 disabled={pending}
                 onClick={() => add(r)}
-                className="flex-shrink-0 rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="flex-shrink-0 border border-foreground bg-foreground px-3 py-1.5 text-xs font-bold uppercase text-background transition-opacity hover:opacity-80 disabled:opacity-50"
               >
                 {addingId === r.videoId ? "추가 중…" : "+ 추가"}
               </button>
@@ -193,18 +193,18 @@ function PasteMode({ slug, addedBy }: { slug: string; addedBy: string }) {
         name="youtube"
         required
         placeholder="유튜브 링크 (youtu.be/... 또는 watch?v=...)"
-        className="rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/40 dark:border-white/20 dark:focus:border-white/50"
+        className="border border-[var(--line)] bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground"
       />
       <input
         name="title"
         placeholder="곡 제목 (선택)"
-        className="rounded-lg border border-black/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/40 dark:border-white/20 dark:focus:border-white/50"
+        className="border border-[var(--line)] bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground"
       />
       {error && <p className="text-sm text-red-500">{error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="self-start rounded-lg bg-foreground px-5 py-2 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="self-start border border-foreground bg-foreground px-5 py-2 text-sm font-bold uppercase tracking-wide text-background transition-opacity hover:opacity-80 disabled:opacity-50"
       >
         {pending ? "추가 중…" : "+ 추가"}
       </button>

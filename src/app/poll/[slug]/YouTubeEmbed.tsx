@@ -50,14 +50,12 @@ export function YouTubeEmbed({
       <img
         src={youtubeThumbnail(videoId)}
         alt=""
-        className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+        className="h-full w-full object-cover opacity-80 grayscale transition-all group-hover:opacity-100 group-hover:grayscale-0"
         loading="lazy"
       />
       <span className="absolute inset-0 flex items-center justify-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-white transition-transform group-hover:scale-110">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="ml-1 h-7 w-7">
-            <path d="M8 5v14l11-7z" />
-          </svg>
+        <span className="flex h-12 w-12 items-center justify-center border border-white/80 bg-black/50 font-bold text-white transition-transform group-hover:scale-110">
+          ▶
         </span>
       </span>
     </button>

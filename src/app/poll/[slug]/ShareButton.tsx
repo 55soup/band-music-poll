@@ -19,9 +19,9 @@ export function ShareButton() {
     <button
       type="button"
       onClick={copy}
-      className="rounded-lg border border-black/15 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-black/[.04] dark:border-white/20 dark:hover:bg-white/[.08]"
+      className="flex-shrink-0 border border-[var(--line)] px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors hover:border-foreground hover:bg-foreground hover:text-background"
     >
-      {copied ? "링크 복사됨 ✓" : "🔗 링크 공유"}
+      {copied ? "[ 복사됨 ]" : "[ 공유 ]"}
     </button>
   );
 }

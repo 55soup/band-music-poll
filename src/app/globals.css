@@ -2,13 +2,18 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0a0a0a;
+  --muted: #6b6b6b;
+  --line: rgba(0, 0, 0, 0.2);
+  --dot: rgba(0, 0, 0, 0.07);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-muted: var(--muted);
+  /* 하이브리드 아스키: 본문 전체를 모노스페이스로 */
+  --font-sans: var(--font-geist-mono);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -16,11 +21,40 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --muted: #8a8a8a;
+    --line: rgba(255, 255, 255, 0.24);
+    --dot: rgba(255, 255, 255, 0.08);
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo,
+    monospace;
+  /* 도트 그리드 배경 (Acne 스타일) */
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 13px 13px;
+}
+
+::selection {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+/* 컨테이너 폭만큼 문자를 반복해 자르는 아스키 구분선 */
+.ascii-rule {
+  overflow: hidden;
+  white-space: nowrap;
+  user-select: none;
+  color: var(--line);
+  line-height: 1;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+}
+
+/* 아스키 막대: 글자 사이가 벌어지지 않게 */
+.ascii-bar {
+  letter-spacing: -0.04em;
+  white-space: nowrap;
 }

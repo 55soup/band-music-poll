@@ -1,6 +1,7 @@
 "use client";
 
 import { useOptimistic, useTransition } from "react";
+import { asciiBar } from "@/lib/ascii";
 import { toggleVote } from "./actions";
 
 type VoteState = { voteCount: number; votedByMe: boolean };
@@ -10,11 +11,13 @@ export function VoteButton({
   songId,
   voteCount,
   votedByMe,
+  maxVotes,
 }: {
   slug: string;
   songId: string;
   voteCount: number;
   votedByMe: boolean;
+  maxVotes: number;
 }) {
   const [, startTransition] = useTransition();
 
@@ -38,20 +41,28 @@ export function VoteButton({
     });
   }
 
+  // 낙관적 득표수가 현재 최대치를 넘으면 그 값을 상한으로 써서 막대가 꽉 차게
+  const scale = Math.max(maxVotes, optimistic.voteCount);
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={optimistic.votedByMe}
-      className={[
-        "flex min-w-16 items-center justify-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
-        optimistic.votedByMe
-          ? "border-transparent bg-foreground text-background"
-          : "border-black/20 hover:bg-black/[.04] dark:border-white/25 dark:hover:bg-white/[.08]",
-      ].join(" ")}
-    >
-      <span>👍</span>
-      <span>{optimistic.voteCount}</span>
-    </button>
+    <div className="flex items-center gap-3">
+      <span className="ascii-bar hidden text-sm text-muted sm:inline">
+        {asciiBar(optimistic.voteCount, scale)}
+      </span>
+      <button
+        type="button"
+        onClick={onClick}
+        aria-pressed={optimistic.votedByMe}
+        className={[
+          "flex min-w-20 items-center justify-center gap-2 border px-3 py-2 text-sm font-bold tabular-nums transition-colors",
+          optimistic.votedByMe
+            ? "border-foreground bg-foreground text-background"
+            : "border-[var(--line)] hover:border-foreground",
+        ].join(" ")}
+      >
+        <span>{optimistic.votedByMe ? "■" : "▲"}</span>
+        <span>{String(optimistic.voteCount).padStart(2, "0")}</span>
+      </button>
+    </div>
   );
 }
