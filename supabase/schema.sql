@@ -12,6 +12,7 @@ create table if not exists public.polls (
   title             text not null,
   performance_date  date,          -- 공연 날짜 (선택)
   target_song_count int,           -- 공연에서 할 곡 수 (선택)
+  setlist_order     jsonb,         -- 수동 공연 순서 (곡 id 배열); null 이면 추천 순서 사용
   created_at        timestamptz not null default now()
 );
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPollBySlug, getSongsWithVotes } from "@/lib/queries";
-import { buildSetlist } from "@/lib/setlist";
+import { orderSelected } from "@/lib/setlist";
 import { AsciiRule } from "@/app/_components/AsciiRule";
 import { AddSongForm } from "./AddSongForm";
 import { VoteButton } from "./VoteButton";
@@ -9,6 +9,7 @@ import { ShareButton } from "./ShareButton";
 import { YouTubeEmbed } from "./YouTubeEmbed";
 import { DeleteSongButton } from "./DeleteSongButton";
 import { PerformanceSettings } from "./PerformanceSettings";
+import { SetlistEditor } from "./SetlistEditor";
 
 /** "YYYY-MM-DD" 를 로컬 자정 기준 D-day 라벨로 (D-7 / D-DAY / D+3) */
 function ddayLabel(performanceDate: string): string {
@@ -35,14 +36,11 @@ export default async function PollPage({
   const maxVotes = songs.reduce((m, s) => Math.max(m, s.vote_count), 0);
 
   // 공연 곡 수가 정해졌으면 상위 N곡을 "선정곡"으로, 그 순서를 공연 흐름으로 추천
+  // (수동 순서가 저장돼 있으면 그걸 우선, 없으면 휴리스틱)
   const target = poll.target_song_count;
   const selected = target ? songs.slice(0, target) : [];
-  const setlist = buildSetlist(selected);
-  const roleLabel: Record<string, string> = {
-    opener: "오프닝",
-    finale: "피날레",
-    body: "",
-  };
+  const setlistSongs = orderSelected(selected, poll.setlist_order);
+  const isManualOrder = !!poll.setlist_order && poll.setlist_order.length > 0;
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-5 py-10">
@@ -99,39 +97,24 @@ export default async function PollPage({
         </div>
       </header>
 
-      {/* 추천 셋리스트 (공연 곡 수가 정해졌을 때) */}
-      {setlist.length > 0 && (
+      {/* 추천/수동 셋리스트 (공연 곡 수가 정해졌을 때) */}
+      {setlistSongs.length > 0 && (
         <section className="mb-10 border border-[var(--line)] p-4">
           <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-muted">
-            [ 추천 셋리스트 ]
+            [ 셋리스트 {isManualOrder ? "(수동)" : "(추천)"} ]
           </h2>
           <p className="mt-1 text-[0.7rem] leading-relaxed text-muted">
-            지금 투표수(인기) 기준 공연 흐름 추천 순서예요. 2위 곡으로 열고,
-            1위 곡으로 닫아요.
+            {isManualOrder
+              ? "수동으로 정한 공연 순서예요. ⠿ 를 드래그해서 바꿀 수 있어요."
+              : "투표수(인기) 기준 공연 흐름 추천이에요 (2위로 열고 1위로 닫음). ⠿ 를 드래그하면 수동으로 바뀌어요."}
           </p>
-          <ol className="mt-3 flex flex-col">
-            {setlist.map((entry) => (
-              <li
-                key={entry.song.id}
-                className="flex items-center gap-3 border-[var(--line)] py-2 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-dashed"
-              >
-                <span className="text-sm font-bold tabular-nums text-muted">
-                  {String(entry.position).padStart(2, "0")}
-                </span>
-                <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                  {entry.song.title}
-                </span>
-                {roleLabel[entry.role] && (
-                  <span className="flex-shrink-0 border border-foreground px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide">
-                    {roleLabel[entry.role]}
-                  </span>
-                )}
-                <span className="flex-shrink-0 text-xs tabular-nums text-muted">
-                  ▲{String(entry.song.vote_count).padStart(2, "0")}
-                </span>
-              </li>
-            ))}
-          </ol>
+          <div className="mt-3">
+            <SetlistEditor
+              slug={slug}
+              songs={setlistSongs}
+              isManual={isManualOrder}
+            />
+          </div>
         </section>
       )}
 

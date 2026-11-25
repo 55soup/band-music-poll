@@ -4,6 +4,7 @@ export type Poll = {
   title: string;
   performance_date: string | null; // 공연 날짜 (YYYY-MM-DD), 미설정이면 null
   target_song_count: number | null; // 공연 곡 수, 미설정이면 null
+  setlist_order: string[] | null; // 수동 공연 순서 (곡 id 배열), 없으면 추천 순서
   created_at: string;
 };
 

@@ -98,6 +98,35 @@ export async function updatePollSettings(
   return { ok: true };
 }
 
+/** 셋리스트 수동 순서 저장 (곡 id 배열). 로그인 없으니 누구나 가능 */
+export async function updateSetlistOrder(
+  slug: string,
+  orderedIds: string[],
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("polls")
+    .update({ setlist_order: orderedIds })
+    .eq("slug", slug);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/poll/${slug}`);
+  return { ok: true };
+}
+
+/** 셋리스트 순서 초기화 → 추천(휴리스틱) 순서로 되돌림 */
+export async function resetSetlistOrder(slug: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("polls")
+    .update({ setlist_order: null })
+    .eq("slug", slug);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/poll/${slug}`);
+  return { ok: true };
+}
+
 /** 투표 토글: 이미 했으면 취소, 안 했으면 추가 */
 export async function toggleVote(
   slug: string,
